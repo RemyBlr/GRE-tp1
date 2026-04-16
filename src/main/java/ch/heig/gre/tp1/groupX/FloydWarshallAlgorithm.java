@@ -74,24 +74,33 @@ public final class FloydWarshallAlgorithm implements APSPAlgorithm {
   }
 
   private List<Integer> extractNegativeCycle(int[][] predecessors, int start, int n) {
-    // go back n times to ensure we are in the cycle
+    // Follow predecessors in the shortest-path tree rooted at start.
     int s = start;
-    for(int r = 0; r < n; ++r)
-      s = predecessors[s][start];
-
-    // in the cycle
-    List<Integer> cycle = new ArrayList<>();
-    int current = s;
-    cycle.add(current);
-    int next = predecessors[current][start];
-    while (next != s) {
-      cycle.addFirst(next);
-      next = predecessors[next][start];
+    for (int r = 0; r < n; ++r) {
+      s = predecessors[start][s];
+      if (s == UNREACHABLE) {
+        return List.of(start, start);
+      }
     }
 
-    // close the cycle
-    cycle.addFirst(s);
+    // Collect one cycle by walking predecessors until we come back to s.
+    List<Integer> reverseCycle = new ArrayList<>();
+    int current = s;
+    do {
+      reverseCycle.add(current);
+      current = predecessors[start][current];
+      if (current == UNREACHABLE) {
+        return List.of(start, start);
+      }
+    } while (current != s && reverseCycle.size() <= n + 1);
 
-    return  cycle;
+    // Rebuild in forward edge order and close the cycle.
+    List<Integer> cycle = new ArrayList<>(reverseCycle.size() + 1);
+    for (int i = reverseCycle.size() - 1; i >= 0; --i) {
+      cycle.add(reverseCycle.get(i));
+    }
+    cycle.add(cycle.get(0));
+
+    return cycle;
   }
 }

@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public class Main {
   public static void main(String[] args) throws IOException {
-    WeightedDigraph graph = WeightedDigraphReader.fromFile("data/reseau2.txt");
+    WeightedDigraph graph = WeightedDigraphReader.fromFile("data/reseau1.txt");
     FloydWarshallAlgorithm algo = new FloydWarshallAlgorithm();
     APSPResult result = algo.compute(graph);
 
